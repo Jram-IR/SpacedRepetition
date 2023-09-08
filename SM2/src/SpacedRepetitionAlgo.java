@@ -15,12 +15,11 @@ public class SpacedRepetitionAlgo {
         public double getEasinessFactor() { return easinessFactor; }
     }
     public static ReviewResult reviewCard(boolean graduated, String learningTag, String previousLearningTag, int previousMinutes, double previousEasinessfactor) {
-        // Define the intervals for each learning tag
+        // Define the intervals for each learning tag when not graduated
         int againInterval = 1; // Minutes
-        int hardInterval = 10; // Minutes
-        int goodInterval = 60; // Minutes
-        int easyInterval = 1440; // Minutes (1 day)
-
+        int hardInterval = 3; // Minutes
+        int goodInterval = 5; // Minutes
+        int easyInterval = 10; // Minutes (1 day)
 
         // Calculate the next review time based on the learning tag and previous time
         int nextInterval = switch (learningTag) {
@@ -37,16 +36,10 @@ public class SpacedRepetitionAlgo {
         // Calculate the time in minutes until the next review
         int timeMinutes = nextInterval;
 
-        //first time graduation
-
+        // card graduates after 2 consecutive "Easy" user rating
         if (!graduated && learningTag.equals("Easy") && previousLearningTag.equals("Easy")) {
 
             graduated = true;
-
-            double q = 4.0; // value of q for easy
-
-            // Update the easiness factor based on your formula and the calculated q
-            easinessFactor += (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
 
             nextInterval = (int) (previousMinutes * easinessFactor);
 
@@ -54,12 +47,18 @@ public class SpacedRepetitionAlgo {
             timeMinutes = nextInterval;
         }
 
+        // graduated card becomes false after "Again" user rating
+        else if(graduated && learningTag.equals("Again")) {
+
+            graduated = false;
+        }
+
         //already graduated
 
         else if (graduated) {
+
             // Calculate the value of q based on the user rating
             double q = switch (learningTag) {
-                case "Again" -> 1.0;
                 case "Hard" -> 2.0;
                 case "Good" -> 3.0;
                 case "Easy" -> 4.0;
@@ -76,6 +75,7 @@ public class SpacedRepetitionAlgo {
             // Update the timeMinutes with the new interval
             timeMinutes = nextInterval;
         }
+
 
         // Return the results
         return new ReviewResult(graduated, timeMinutes, easinessFactor);
