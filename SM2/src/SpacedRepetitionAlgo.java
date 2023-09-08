@@ -15,11 +15,21 @@ public class SpacedRepetitionAlgo {
         public double getEasinessFactor() { return easinessFactor; }
     }
     public static ReviewResult reviewCard(boolean graduated, String learningTag, String previousLearningTag, int previousMinutes, double previousEasinessfactor) {
+
+
+
+
+        // NOT GRADUATED //
+
+
+
+
         // Define the intervals for each learning tag when not graduated
+
         int againInterval = 1; // Minutes
         int hardInterval = 3; // Minutes
         int goodInterval = 5; // Minutes
-        int easyInterval = 10; // Minutes (1 day)
+        int easyInterval = 10; // Minutes
 
         // Calculate the next review time based on the learning tag and previous time
         int nextInterval = switch (learningTag) {
@@ -30,28 +40,41 @@ public class SpacedRepetitionAlgo {
             default -> againInterval;
         };
 
-        // Default easiness factor
-        double easinessFactor = 2.5;
-
         // Calculate the time in minutes until the next review
         int timeMinutes = nextInterval;
 
+        // Default easiness factor
+        double easinessFactor = 2.5;
+
+
+
+
+        // GRADUATED //
+
+
+
+
         // card graduates after 2 consecutive "Easy" user rating
+
         if (!graduated && learningTag.equals("Easy") && previousLearningTag.equals("Easy")) {
 
             graduated = true;
 
-            nextInterval = (int) (previousMinutes * easinessFactor);
-
-            // Update the timeMinutes with the new interval
-            timeMinutes = nextInterval;
+            // Update the timeMinutes with 1 day
+            timeMinutes = 1440;
         }
 
+
+
+
         // graduated card becomes false after "Again" user rating
+
         else if(graduated && learningTag.equals("Again")) {
 
             graduated = false;
         }
+
+
 
         //already graduated
 
